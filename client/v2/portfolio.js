@@ -8,6 +8,7 @@ let currentPagination = {};
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
+const selectBrand = document.querySelector('#brand-select');
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
 
@@ -27,10 +28,10 @@ const setCurrentProducts = ({result, meta}) => {
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
  */
-const fetchProducts = async (page = 1, size = 12) => {
+const fetchProducts = async (page = 1, size = 12, brand="") => {
   try {
     const response = await fetch(
-      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
+      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}&brand=${brand}`
     );
     const body = await response.json();
 
@@ -110,7 +111,7 @@ const render = (products, pagination) => {
  * Select the number of products to display
  */
 selectShow.addEventListener('change', async (event) => {
-  const products = await fetchProducts(currentPagination.currentPage, parseInt(event.target.value));
+  const products = await fetchProducts(currentPagination.value, parseInt(event.target.value), selectBrand.value);
 
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -122,3 +123,91 @@ document.addEventListener('DOMContentLoaded', async () => {
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
+/*
+ Feature 1 - Browse pages
+As a user
+I want to browse available pages
+So that I can load more products
+*/
+selectPage.addEventListener('change', async (event) => {
+    const products = await fetchProducts(parseInt(event.target.value), selectShow.value, selectBrand.value);
+
+    setCurrentProducts(products);
+    render(currentProducts, currentPagination);
+});
+/*
+Feature 2 - Filter by brands
+As a user
+I want to filter by brands name
+So that I can browse product for a specific brand
+*/
+selectBrand.addEventListener('change', async (event) => {
+    console.log(event.target.value);
+    let products = await fetchProducts(currentPagination.value, selectShow.value, event.target.value);
+    console.log(products);
+    setCurrentProducts(products);
+    render(currentProducts, currentPagination);
+});
+
+/*
+
+Feature 3 - Filter by recent products
+As a user
+I want to filter by by recent products
+So that I can browse the new released products (less than 2 weeks)
+
+Feature 4 - Filter by reasonable price
+As a user
+I want to filter by reasonable price
+So that I can buy affordable product i.e less than 50€
+
+Feature 5 - Sort by price
+As a user
+I want to sort by price
+So that I can easily identify cheapest and expensive products
+
+Feature 6 - Sort by date
+As a user
+I want to sort by price
+So that I can easily identify recent and old products
+
+Feature 8 - Number of products indicator
+As a user
+I want to indicate the total number of products
+So that I can understand how many products is available
+
+Feature 9 - Number of recent products indicator
+As a user
+I want to indicate the total number of recent products
+So that I can understand how many new products are available
+
+Feature 10 - p50, p90 and p95 price value indicator
+As a user
+I want to indicate the p50, p90 and p95 price value
+So that I can understand the price values of the products
+
+Feature 11 - Last released date indicator
+As a user
+I want to indicate the last released date
+So that I can understand if we have new products
+
+Feature 12 - Open product link
+As a user
+I want to open product link in a new page
+So that I can buy the product easily
+
+Feature 13 - Save as favorite
+As a user
+I want to save a product as favorite
+So that I can retreive this product later
+
+Feature 14 - Filter by favorite
+As a user
+I want to filter by favorite products
+So that I can load only my favorite products
+
+Feature 15 - Usable and pleasant UX
+As a user
+I want to parse a usable and pleasant web page
+So that I can find valuable and useful content
+ */

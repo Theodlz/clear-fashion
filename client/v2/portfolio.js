@@ -8,6 +8,11 @@ let currentPagination = {};
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
+const selectBrand = document.querySelector('#brand-select');
+
+const filterPrice = document.querySelector('#btn-price');
+const filterRecent = document.querySelector('#btn-recent');
+
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
 
@@ -27,10 +32,10 @@ const setCurrentProducts = ({result, meta}) => {
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
  */
-const fetchProducts = async (page = 1, size = 12) => {
+const fetchProducts = async (page = 1, size = 12, brand="") => {
   try {
     const response = await fetch(
-      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
+      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}&brand=${brand}`
     );
     const body = await response.json();
 
@@ -110,7 +115,63 @@ const render = (products, pagination) => {
  * Select the number of products to display
  */
 selectShow.addEventListener('change', async (event) => {
-  const products = await fetchProducts(currentPagination.currentPage, parseInt(event.target.value));
+  const products = await fetchProducts(selectPage.value, parseInt(event.target.value),selectBrand.value);
+
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+selectPage.addEventListener('change', async (event) => {
+  const products = await fetchProducts(parseInt(event.target.value),selectShow.value,selectBrand.value);
+
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+selectBrand.addEventListener('change', async (event) => {
+  const products = await fetchProducts(selectPage.value,selectShow.value,event.target.value);
+
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+filterRecent.addEventListener('click', async (event) => {
+  const products = await fetchProducts(selectPage.value,selectShow.value,selectBrand.value);
+
+  if(filterRecent.style.backgroundColor == "lightblue"){
+    filterRecent.style.backgroundColor = "lightgrey";
+      
+  }
+  else{
+    filterRecent.style.backgroundColor = "lightblue"
+    for (let i = 0; i < products.result.length; i++) {
+      var miliseconds = (new Date()) - (new Date(products.result[i].released))
+      var days = miliseconds/1000/3600/24
+      if(days>30){
+        delete products.result[i]
+      }
+    }
+  }
+
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+filterPrice.addEventListener('click', async (event) => {
+  const products = await fetchProducts(selectPage.value,selectShow.value,selectBrand.value);
+
+  if(filterPrice.style.backgroundColor == "lightblue"){
+    filterPrice.style.backgroundColor = "lightgrey";
+      
+  }
+  else{
+    filterPrice.style.backgroundColor = "lightblue"
+    for (let i = 0; i < products.result.length; i++) {
+      if(products.result[i].price > 50){
+        delete products.result[i]
+      }
+    }
+  }
 
   setCurrentProducts(products);
   render(currentProducts, currentPagination);

@@ -20,11 +20,18 @@
         <select name="page" id="page-select"> </select>
       </div>
       <div id="filters">
-        <span>By reasonable price</span>
-        <span>By recently released</span>
+        <button id="btn-price"><span>By reasonable price</span></button>
+        <button id="btn-recent"><span>By recently released</span></button>
         <div id="brand">
           <label for="brand-select">By brands:</label>
-          <select name="brand" id="brand-select"> </select>
+          <select name="brand" id="brand-select">
+            <option value="">Choose brand</option>
+            <option value="1083">1083</option>
+            <option value="adresse">Adresse</option>
+            <option value="coteleparis">Coteleparis</option>
+            <option value="dedicated">Dedicated</option>
+            <option value="loom">Loom</option>
+          </select>
         </div>
       </div>
       <div id="sort">

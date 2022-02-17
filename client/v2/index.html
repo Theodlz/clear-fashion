@@ -2,6 +2,11 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
     <title>👕 Clear Fahion | Environmentally & human-friendly clothes</title>
   </head>
   <body>
@@ -22,6 +27,7 @@
       <div id="filters">
         <button id="btn-price"><span>By reasonable price</span></button>
         <button id="btn-recent"><span>By recently released</span></button>
+        <button id="btn-fav"><span>By favorite</span></button>
         <div id="brand">
           <label for="brand-select">By brands:</label>
           <select name="brand" id="brand-select">
@@ -71,7 +77,11 @@
         <span id="lastRealease">2020-01-01</span>
       </div>
     </section>
-    <section id="products"></section>
+
+    <h2>Products</h2>
+    <table class="display" id="products">
+      
+    </table>
     <script type="text/javascript" charset="UTF-8" src="portfolio.js"></script>
   </body>
 </html>

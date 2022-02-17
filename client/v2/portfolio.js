@@ -9,12 +9,14 @@ let currentPagination = {};
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const selectBrand = document.querySelector('#brand-select');
+const selectSort = document.querySelector('#sort-select');
 
 const filterPrice = document.querySelector('#btn-price');
 const filterRecent = document.querySelector('#btn-recent');
 
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
+const spanLastRelease = document.querySelector('#lastRealease');
 
 /**
  * Set global value
@@ -63,7 +65,7 @@ const renderProducts = products => {
       return `
       <div class="product" id=${product.uuid}>
         <span>${product.brand}</span>
-        <a href="${product.link}">${product.name}</a>
+        <a href="${product.link}" target="_blank">${product.name}</a>
         <span>${product.price}</span>
       </div>
     `;
@@ -95,16 +97,20 @@ const renderPagination = pagination => {
  * Render page selector
  * @param  {Object} pagination
  */
-const renderIndicators = pagination => {
+const renderIndicators = (products, pagination) => {
   const {count} = pagination;
-
+  var last_release = (products.sort(function(a,b) {
+    return Date.parse(b.released) - Date.parse(a.released);
+    }))[0].released
+  
   spanNbProducts.innerHTML = count;
+  spanLastRelease.innerHTML = last_release;
 };
 
 const render = (products, pagination) => {
   renderProducts(products);
   renderPagination(pagination);
-  renderIndicators(pagination);
+  renderIndicators(products,pagination);
 };
 
 /**
@@ -132,6 +138,30 @@ selectBrand.addEventListener('change', async (event) => {
   const products = await fetchProducts(selectPage.value,selectShow.value,event.target.value);
 
   setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+selectSort.addEventListener('change', async (event) => {
+  if (event.target.value == "price-desc"){
+    currentProducts.sort(function(a,b) {
+      return b.price - a.price;
+      });
+  }
+  if (event.target.value == "price-asc"){
+    currentProducts.sort(function(a,b) {
+      return a.price - b.price;
+      });
+  }
+  if (event.target.value == "date-desc"){
+    currentProducts.sort(function(a,b) {
+      return Date.parse(b.released) - Date.parse(a.released);
+      });
+  }
+  if (event.target.value == "date-asc"){
+    currentProducts.sort(function(a,b) {
+      return Date.parse(a.released) - Date.parse(b.released);
+      });
+  }
   render(currentProducts, currentPagination);
 });
 

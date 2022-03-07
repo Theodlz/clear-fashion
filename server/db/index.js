@@ -73,6 +73,20 @@ module.exports.find = async query => {
   }
 };
 
+// export sort function that takes the result of find as an input
+module.exports.find_sort = async (query, sort) => {
+  try {
+    const db = await getDB();
+    const collection = db.collection(MONGODB_COLLECTION);
+    const result = await collection.find(query).sort(sort).toArray();
+
+    return result;
+  } catch (error) {
+    console.error('🚨 collection.find.sort...', error);
+    return null;
+  }
+};
+
 /**
  * Close the connection
  */

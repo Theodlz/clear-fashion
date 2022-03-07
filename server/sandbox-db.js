@@ -56,13 +56,41 @@ async function sandbox () {
     console.log(`💽  ${result.insertedCount} inserted products`);
 
     console.log('\n');
-
+    
     console.log('💽  Find Loom products only');
 
     const loomOnly = await db.find({'brand': 'loom'});
 
     console.log(`👕 ${loomOnly.length} total of products found for Loom`);
     console.log(loomOnly);
+
+    console.log('💽  Find products less than 60 euros');
+
+    const lessThan60 = await db.find({'price': {'$lt': 60}});
+
+    console.log(`👕 ${lessThan60.length} total of products found for less than 60 euros`);
+    console.log(lessThan60);
+
+    console.log('💽  Find products sorted by price');
+
+    const sortedByPrice = await db.find_sort({},{'price': 1});
+
+    console.log(`👕 ${sortedByPrice.length} total of products found sorted by price`);
+    console.log(sortedByPrice);
+
+    console.log('💽  Find products sorted by date');
+
+    const sortedByDate = await db.find_sort({},{'date': -1});
+
+    console.log(`👕 ${sortedByDate.length} total of products found sorted by date`);
+    console.log(sortedByDate);
+
+    console.log('💽  Find products scraped less than 2 weeks ago');
+
+    const scrapedLessThan2Weeks = await db.find({'date': {'$gt': new Date(Date.now() - 1000 * 60 * 60 * 24 * 14)}});
+
+    console.log(`👕 ${scrapedLessThan2Weeks.length} total of products found scraped less than 2 weeks ago`);
+    console.log(scrapedLessThan2Weeks);
 
     db.close();
   } catch (e) {

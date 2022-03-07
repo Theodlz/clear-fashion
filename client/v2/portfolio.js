@@ -9,6 +9,8 @@ let currentPagination = {};
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const selectBrand = document.querySelector('#brand-select');
+const filterReasonable = document.querySelector('#reasonable-price');
+const filterRecentlyReleased = document.querySelector('#recently-released')
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
 
@@ -28,16 +30,22 @@ const setCurrentProducts = ({result, meta}) => {
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
  */
-const fetchProducts = async (page = 1, size = 12, brand="") => {
+const fetchProducts = async (page = 1, size = 12, brand="", reasonnable_price=false, recently_released=false) => {
   try {
     const response = await fetch(
       `https://clear-fashion-api.vercel.app?page=${page}&size=${size}&brand=${brand}`
     );
-    const body = await response.json();
+    let body = await response.json();
 
     if (body.success !== true) {
       console.error(body);
       return {currentProducts, currentPagination};
+      }
+    if (reasonnable_price) {
+        body.data.result = body.data.result.filter(item => item.price < 50);
+    }
+    if (recently_released) {
+        body.data.result = body.data.result.filter(item => ((new Date() - new Date(item.released)) / (1000 * 3600 * 24 * 7) ) < 8);
     }
 
     return body.data;
@@ -61,6 +69,7 @@ const renderProducts = products => {
         <span>${product.brand}</span>
         <a href="${product.link}">${product.name}</a>
         <span>${product.price}</span>
+        <button style="border: none; background : none; color:#8FB8C1; font-size : 20px;" onclick= AddToFavorites('${product.uuid}')>${"&#10084;"}</button>
       </div>
     `;
     })
@@ -71,6 +80,10 @@ const renderProducts = products => {
   sectionProducts.innerHTML = '<h2>Products</h2>';
   sectionProducts.appendChild(fragment);
 };
+
+const AddToFavorites = function (uuid) {
+
+}
 
 /**
  * Render page selector
@@ -111,7 +124,7 @@ const render = (products, pagination) => {
  * Select the number of products to display
  */
 selectShow.addEventListener('change', async (event) => {
-  const products = await fetchProducts(currentPagination.value, parseInt(event.target.value), selectBrand.value);
+    const products = await fetchProducts(currentPagination.value, parseInt(event.target.value), selectBrand.value, filterReasonable.checked, filterRecentlyReleased.checked);
 
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -130,8 +143,7 @@ I want to browse available pages
 So that I can load more products
 */
 selectPage.addEventListener('change', async (event) => {
-    const products = await fetchProducts(parseInt(event.target.value), selectShow.value, selectBrand.value);
-
+    const products = await fetchProducts(parseInt(event.target.value), selectShow.value, selectBrand.value, filterReasonable.checked, filterRecentlyReleased.checked);
     setCurrentProducts(products);
     render(currentProducts, currentPagination);
 });
@@ -142,9 +154,7 @@ I want to filter by brands name
 So that I can browse product for a specific brand
 */
 selectBrand.addEventListener('change', async (event) => {
-    console.log(event.target.value);
-    let products = await fetchProducts(currentPagination.value, selectShow.value, event.target.value);
-    console.log(products);
+    let products = await fetchProducts(currentPagination.value, selectShow.value, event.target.value, filterReasonable.checked, filterRecentlyReleased.checked);
     setCurrentProducts(products);
     render(currentProducts, currentPagination);
 });
@@ -155,12 +165,28 @@ Feature 3 - Filter by recent products
 As a user
 I want to filter by by recent products
 So that I can browse the new released products (less than 2 weeks)
+*/
+filterRecentlyReleased.addEventListener('click', async (event) => {
+    let products = await fetchProducts(currentPagination.value, selectShow.value, selectBrand.value, filterReasonable.checked, event.target.checked);
+    setCurrentProducts(products);
+    render(currentProducts, currentPagination);
+});
 
+
+/*
 Feature 4 - Filter by reasonable price
 As a user
 I want to filter by reasonable price
 So that I can buy affordable product i.e less than 50€
+*/
 
+filterReasonable.addEventListener('click', async (event) => {
+    let products = await fetchProducts(currentPagination.value, selectShow.value, selectBrand.value, event.target.checked, filterRecentlyReleased.checked);
+    setCurrentProducts(products);
+    render(currentProducts, currentPagination);
+});
+
+/*
 Feature 5 - Sort by price
 As a user
 I want to sort by price
@@ -171,10 +197,14 @@ As a user
 I want to sort by price
 So that I can easily identify recent and old products
 
+
+
 Feature 8 - Number of products indicator
 As a user
 I want to indicate the total number of products
 So that I can understand how many products is available
+
+
 
 Feature 9 - Number of recent products indicator
 As a user

@@ -87,6 +87,20 @@ module.exports.find_sort = async (query, sort) => {
   }
 };
 
+// export sort function that takes the result of find and a limit as an input
+module.exports.find_limit = async (query, limit) => {
+  try {
+    const db = await getDB();
+    const collection = db.collection(MONGODB_COLLECTION);
+    const result = await collection.find(query).limit(limit).toArray();
+
+    return result;
+  } catch (error) {
+    console.error('🚨 collection.find.limit...', error);
+    return null;
+  }
+};
+
 /**
  * Close the connection
  */

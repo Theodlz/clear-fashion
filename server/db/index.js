@@ -101,6 +101,19 @@ module.exports.find_limit = async (query, limit) => {
   }
 };
 
+// export sort function that takes the result of find, a skip and a limit as an input
+module.exports.find_skip_limit = async (query, skip, limit) => {
+  try {
+    const db = await getDB();
+    const collection = db.collection(MONGODB_COLLECTION);
+    const result = await collection.find(query).skip(skip).limit(limit).toArray();
+    return result;
+  } catch (error) {
+    console.error('🚨 collection.find.skip.limit...', error);
+    return null;
+  }
+};
+
 /**
  * Close the connection
  */

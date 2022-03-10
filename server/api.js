@@ -26,6 +26,7 @@ app.get('/products/:id', async (request, response) => {
   const { id } = request.query;
   console.log(id);
   const product = await db.find({'_id': id});
+  console.log(product);
   response.send(product);
 });
 

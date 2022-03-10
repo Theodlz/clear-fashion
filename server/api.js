@@ -21,7 +21,7 @@ app.get('/', (request, response) => {
   response.send({'ack': true});
 });
 
-// endpoint to get a product by id
+// endpoint to get a product by its id
 app.get('/products/:id', async (request, response) => {
   const { id } = request.query;
   console.log(id);

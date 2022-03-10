@@ -19,11 +19,11 @@ app.options('*', cors());
 
 app.get('/', async (request, response) => {
   // set default values for query parameters
-  const { brand = 'all', page = 1, size = 12 } = request.query;
+  const { brand = '', page = 1, size = 12 } = request.query;
   // calculate skip value
   const skip = (parseInt(page) - 1) * parseInt(size);
   let products = [];
-  if(brand === 'all') {
+  if(brand === '') {
     products = await db.find({});
   } else {
     products = await db.find({
@@ -39,19 +39,23 @@ app.get('/', async (request, response) => {
   };
   // slice the products array to include only the products for the current page and return the result
   if(products.length > 0) {
-    response.json({
-      meta,
-      result: products.slice(skip, skip + parseInt(size)),
+    response.send({
       success: true,
+      data: {
+        meta,
+        result: products.slice(skip, skip + parseInt(size)),
+      },
     });
   } else {
-    response.json({
-      meta,
-      result: [],
+    response.send({
       success: false,
+      data: {
+        result: [],
+        meta,
+      }
     });
   }
-  response.send();
+  
 });
 
 // endpoint to get a product by its id

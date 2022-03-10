@@ -20,6 +20,7 @@ app.options('*', cors());
 app.get('/', async (request, response) => {
   // set default values for query parameters
   const { brand = 'all', price = 'all', page = 1, size = 12 } = request.query;
+  // calculate skip value
   const skip = (parseInt(page) - 1) * parseInt(size);
   if(brand === 'all' && price === 'all') {
     const products = await db.find_skip_limit({}, skip, parseInt(size));

@@ -24,6 +24,7 @@ app.get('/', (request, response) => {
 // endpoint to get a product by id
 app.get('/products/:id', async (request, response) => {
   const { id } = request.query;
+  console.log(id);
   const product = await db.find({'_id': id});
   response.send(product);
 });

@@ -42,6 +42,7 @@ const fetchProducts = async (page = 1, size = 12, brand="") => {
     );
     const body = await response.json();
 
+    console.log(body);
     if (body.success !== true) {
       console.error(body);
       return {currentProducts, currentPagination};

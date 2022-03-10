@@ -19,28 +19,39 @@ app.options('*', cors());
 
 app.get('/', async (request, response) => {
   // set default values for query parameters
-  const { brand = 'all', price = 'all', page = 1, size = 12 } = request.query;
+  const { brand = 'all', page = 1, size = 12 } = request.query;
   // calculate skip value
   const skip = (parseInt(page) - 1) * parseInt(size);
-  if(brand === 'all' && price === 'all') {
-    const products = await db.find_skip_limit({}, skip, parseInt(size));
-    response.send(products);
-  } else if(brand === 'all') {
-    const products = await db.find_limit({'price': parseInt(price)}, skip, parseInt(size));
-    response.send(products);
-  } else if(price === 'all') {
-    const products = await db.find_limit({'brand': brand}, skip, parseInt(size));
-    response.send(products);
+  let products = [];
+  if(brand === 'all') {
+    products = await db.find({});
   } else {
-    const products = await db.find_limit({
-      'brand': brand,
-      'price': parseInt(price)
-    },
-      skip,
-      parseInt(limit)
-    );
-    response.send(products);
+    products = await db.find({
+      'brand': brand
+    });
   }
+  // create metadata for the response that includes pagination info
+  const meta = {
+    count: products.length,
+    currentPage: parseInt(page),
+    pageCount: Math.ceil(products.length / size),
+    pageSize: parseInt(size)
+  };
+  // slice the products array to include only the products for the current page and return the result
+  if(products.length > 0) {
+    response.json({
+      meta,
+      result: products.slice(skip, skip + parseInt(size)),
+      success: true,
+    });
+  } else {
+    response.json({
+      meta,
+      result: [],
+      success: false,
+    });
+  }
+  response.send();
 });
 
 // endpoint to get a product by its id

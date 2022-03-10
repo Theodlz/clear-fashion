@@ -38,7 +38,7 @@ const setCurrentProducts = ({result, meta}) => {
 const fetchProducts = async (page = 1, size = 12, brand="") => {
   try {
     const response = await fetch(
-      `http://localhost:8092?page=${page}&size=${size}&brand=${brand}`
+      `https://https://theodlz-clear-fashion-api.vercel.app?page=${page}&size=${size}&brand=${brand}`
     );
     const body = await response.json();
 

@@ -2,7 +2,7 @@ const cors = require('cors');
 const express = require('express');
 
 const db = require('./db');
-
+const { getProductByID, searchProducts } = require('./handler.js');
 const helmet = require('helmet');
 
 const PORT = 8092;
@@ -60,10 +60,7 @@ app.get('/', async (request, response) => {
 
 // endpoint to get a product by its id
 app.get('/products/:id', async (request, response) => {
-  const { id } = request.query;
-  console.log(id);
-  const product = await db.find({'_id': id});
-  console.log(product);
+  const product = await getProductByID(request);
   response.send(product);
 });
 
@@ -72,27 +69,11 @@ app.get('/products/:id', async (request, response) => {
 // - brand: the brand to search for (default: all brands)
 // - price: the price to search for (default: all prices)
 // - limit: the number of products to return (default: 12)
-app.get('/search', async (request, response) => {
- // set default values for query parameters
-  const { brand = 'all', price = 'all', limit = 12 } = request.query;
-  if(brand === 'all' && price === 'all') {
-    const products = await db.find_limit({}, parseInt(limit));
-    response.send(products);
-  } else if(brand === 'all') {
-    const products = await db.find_limit({'price': parseInt(price)}, parseInt(limit));
-    response.send(products);
-  } else if(price === 'all') {
-    const products = await db.find_limit({'brand': brand}, parseInt(limit));
-    response.send(products);
-  } else {
-    const products = await db.find_limit({
-      'brand': brand,
-      'price': parseInt(price)
-    },
-      parseInt(limit)
-    );
-    response.send(products);
-  }
+
+
+app.get('/search', async (request, response) => {  
+  const products = await searchProducts(request);
+  response.send(products);
 });
 
 app.listen(PORT);
